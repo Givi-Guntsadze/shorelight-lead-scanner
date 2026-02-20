@@ -93,9 +93,7 @@ See `email-templates/confirmation-email.html` for a full template.
 
 | University | URL |
 |------------|-----|
-| Harvard | `https://yoursite.github.io/shorelight-lead-scanner/?uni=HARVARD` |
-| Yale | `https://yoursite.github.io/shorelight-lead-scanner/?uni=YALE` |
-| MIT | `https://yoursite.github.io/shorelight-lead-scanner/?uni=MIT` |
+| Shorelight | `https://givi-guntsadze.github.io/shorelight-lead-scanner/?uni=SHORELIGHT` |
 
 ---
 

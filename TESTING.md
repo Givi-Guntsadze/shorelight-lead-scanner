@@ -82,9 +82,7 @@ Generate unique scanner URLs for each university:
 
 | University | URL |
 |------------|-----|
-| Harvard | `https://yoursite.github.io/shorelight-lead-scanner/?uni=HARVARD` |
-| Yale | `https://yoursite.github.io/shorelight-lead-scanner/?uni=YALE` |
-| MIT | `https://yoursite.github.io/shorelight-lead-scanner/?uni=MIT` |
+| Shorelight | `https://givi-guntsadze.github.io/shorelight-lead-scanner/?uni=SHORELIGHT` |
 
 **Tip**: Convert these URLs to QR codes and print them so volunteers can just scan-to-open.
 
