@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EduFair Live Scanner</title>
+    <title>Shorelight Live Scanner</title>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         :root {
@@ -236,11 +236,11 @@
         // =====================================================
         // CONFIGURATION - Paste your Google Apps Script URL here
         // =====================================================
-        const API_URL = "https://script.google.com/macros/s/AKfycbyTzTjpUhAXTr5qevH8nnvwdzqLevxMWz8RxBt0ZXTVAsm3iy4J78JodPvm8-dE7yM7yA/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwCzrMDttmSmaCCff5T5ZGqjQ3_bmZrKAdYAVQCjn9LmPctZHCp2CjIcPONB19M3lTa/exec";
         // =====================================================
 
         // --- STATE ---
-        const STORAGE_KEY = 'edufair_scan_queue';
+        const STORAGE_KEY = 'shorelight_scan_queue';
         let scanQueue = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         let isOnline = navigator.onLine;
         let isSyncing = false;

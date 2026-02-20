@@ -1,5 +1,5 @@
 """
-EduFair Lead Scanner - Post-Event Processing Script
+Shorelight Lead Scanner - Post-Event Processing Script
 ====================================================
 This script performs the "Split & Delivery" operation after the event ends.
 
@@ -84,7 +84,8 @@ def merge_data(registrations: pd.DataFrame, scans: pd.DataFrame) -> pd.DataFrame
     )
     
     # Check for unmatched scans
-    unmatched = merged[merged['Name'].isna() if 'Name' in merged.columns else merged.iloc[:, 0].isna()]
+    unmatched_col = 'full_name' if 'full_name' in merged.columns else 'Name' if 'Name' in merged.columns else merged.columns[0]
+    unmatched = merged[merged[unmatched_col].isna()]
     if len(unmatched) > 0:
         print(f"⚠️  Warning: {len(unmatched)} scans could not be matched to registrations")
     
@@ -109,11 +110,8 @@ def generate_reports(merged: pd.DataFrame, output_dir: str = 'reports'):
     # Define columns to include in reports
     # Prioritize common registration fields, exclude internal IDs
     priority_columns = [
-        'Name', 'Last Name', 'Email', 'Phone',
-        'Which programs?', 'Intake Year', 'Country',
-        'Additional Info', 'Consent (to receive communication)',
-        # Fallbacks
-        'name', 'email', 'phone'
+        'full_name', 'email', 'phone', 'school',
+        'Grade', 'intake_year', 'consent_text', 'submission_time'
     ]
     
     # Find which columns actually exist
@@ -147,7 +145,7 @@ def generate_reports(merged: pd.DataFrame, output_dir: str = 'reports'):
 
 def main():
     print("\n" + "="*60)
-    print("  EduFair Lead Scanner - Post-Event Processing")
+    print("  Shorelight Lead Scanner - Post-Event Processing")
     print("="*60 + "\n")
     
     # Default file names

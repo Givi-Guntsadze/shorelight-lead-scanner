@@ -1,4 +1,4 @@
-# Testing Plan for EduFair Live Scanner
+# Testing Plan for Shorelight Live Scanner
 
 ## ✅ Automated Tests Completed
 
@@ -37,13 +37,13 @@ Since the app works perfectly, you now need to host it on a real web server (not
 #### Commands to run:
 
 ```bash
-cd c:\Users\user\Documents\LEAF\edufair-lead-scanner
+cd c:\Users\user\Documents\LEAF\shorelight-lead-scanner
 
 # Stage all files
 git add -A
 
 # Commit
-git commit -m "Complete EduFair Live Scanner v1"
+git commit -m "Complete Shorelight Live Scanner v1"
 
 # Push to GitHub
 git push origin main
@@ -59,7 +59,7 @@ git push origin main
 
 Your app will be live at:
 ```
-https://YOUR_USERNAME.github.io/edufair-lead-scanner/
+https://YOUR_USERNAME.github.io/shorelight-lead-scanner/
 ```
 
 ---
@@ -68,7 +68,7 @@ https://YOUR_USERNAME.github.io/edufair-lead-scanner/
 
 Once deployed, test the real scanner:
 
-1. Open on your phone: `https://YOUR_USERNAME.github.io/edufair-lead-scanner/?uni=TEST`
+1. Open on your phone: `https://YOUR_USERNAME.github.io/shorelight-lead-scanner/?uni=TEST`
 2. Allow camera permissions
 3. Scan a QR code (or generate one at [qr-code-generator.com](https://www.qr-code-generator.com/) with text like "USER-123")
 4. Watch for the green flash
@@ -82,9 +82,9 @@ Generate unique scanner URLs for each university:
 
 | University | URL |
 |------------|-----|
-| Harvard | `https://yoursite.github.io/edufair-lead-scanner/?uni=HARVARD` |
-| Yale | `https://yoursite.github.io/edufair-lead-scanner/?uni=YALE` |
-| MIT | `https://yoursite.github.io/edufair-lead-scanner/?uni=MIT` |
+| Harvard | `https://yoursite.github.io/shorelight-lead-scanner/?uni=HARVARD` |
+| Yale | `https://yoursite.github.io/shorelight-lead-scanner/?uni=YALE` |
+| MIT | `https://yoursite.github.io/shorelight-lead-scanner/?uni=MIT` |
 
 **Tip**: Convert these URLs to QR codes and print them so volunteers can just scan-to-open.
 

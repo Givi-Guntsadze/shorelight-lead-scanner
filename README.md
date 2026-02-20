@@ -1,4 +1,4 @@
-# EduFair Lead Scanner
+# Shorelight Lead Scanner
 
 A complete lead retrieval system for education fairs. Enables 30+ universities to digitally collect leads from 3000+ attendees using their smartphones.
 
@@ -8,7 +8,7 @@ A complete lead retrieval system for education fairs. Enables 30+ universities t
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         REGISTRATION PHASE                          │
 ├─────────────────────────────────────────────────────────────────────┤
-│  User → CF7 Form → PHP generates UUID → Google Sheet + Email w/ QR  │
+│  User → CF7 Form → n8n generates ticket_id → Google Sheet + Email w/QR  │
 └─────────────────────────────────────────────────────────────────────┘
                                   ↓
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -29,11 +29,9 @@ A complete lead retrieval system for education fairs. Enables 30+ universities t
 ## Project Structure
 
 ```
-edufair-lead-scanner/
+shorelight-lead-scanner/
 ├── index.html                    # Scanner PWA (deploy to GitHub Pages)
 ├── Code.gs                       # Google Apps Script (deploy as Web App)
-├── wordpress/
-│   └── ticket-id-generator.php   # CF7 UUID generation snippet
 ├── email-templates/
 │   └── confirmation-email.html   # Email template with QR code
 ├── scripts/
@@ -42,34 +40,30 @@ edufair-lead-scanner/
 └── .gitignore
 ```
 
----
-
 ## Setup Guide
 
-### Phase 1: Registration System (WordPress)
+### Phase 1: Registration System (WordPress & n8n)
 
-#### 1.1 Add Hidden Field to CF7 Form
+#### 1.1 Send Data to n8n
+Configure your Contact Form 7 or WordPress integration to send a webhook to your n8n workflow when a user registers.
+
+#### 1.2 Generate Ticket ID
+Inside your n8n workflow, use a **Set node** after the webhook receives the data to generate a unique `ticket_id`. This uses the last 4 digits of the timestamp combined with 4 random alphanumeric characters:
+
+```javascript
+{{ $now.toMillis().toString().slice(-4) }}{{ Math.random().toString(36).substring(2, 6).toUpperCase() }}
 ```
-[hidden ticket_id id:ticket_id default:get]
-```
 
-#### 1.2 Install the UUID Generator
-Copy `wordpress/ticket-id-generator.php` into:
-- **WPCode plugin** (recommended), OR
-- Your theme's `functions.php`
-
-#### 1.3 Map to Google Sheet
-Ensure your CF7-to-Sheet connector includes the `ticket_id` field.
-
-Your sheet should have these columns:
-| Name | Email | Phone | ... | ticket_id |
-|------|-------|-------|-----|-----------|
+#### 1.3 Update Google Sheets
+Send the user's registration details along with the newly generated `ticket_id` to your Google Sheet. Your sheet should have these columns:
+| full_name | email | phone | school | Grade | intake_year | consent_text | submission_time | ticket_id |
+|-----------|-------|-------|--------|-------|-------------|--------------|-----------------|-----------|
 
 #### 1.4 Configure Confirmation Email
-In your email automation (n8n, CF7 Mail, etc.), use this QR code snippet:
+In your n8n email node, generate the dynamic QR code image using QuickChart.io by injecting the `ticket_id` into the URL:
 
 ```html
-<img src="https://quickchart.io/qr?text=[ticket_id]&size=250" alt="QR" />
+<img src="https://quickchart.io/qr?text={{ $json.ticket_id }}&size=250" alt="QR Code" />
 ```
 
 See `email-templates/confirmation-email.html` for a full template.
@@ -99,9 +93,9 @@ See `email-templates/confirmation-email.html` for a full template.
 
 | University | URL |
 |------------|-----|
-| Harvard | `https://yoursite.github.io/edufair-lead-scanner/?uni=HARVARD` |
-| Yale | `https://yoursite.github.io/edufair-lead-scanner/?uni=YALE` |
-| MIT | `https://yoursite.github.io/edufair-lead-scanner/?uni=MIT` |
+| Harvard | `https://yoursite.github.io/shorelight-lead-scanner/?uni=HARVARD` |
+| Yale | `https://yoursite.github.io/shorelight-lead-scanner/?uni=YALE` |
+| MIT | `https://yoursite.github.io/shorelight-lead-scanner/?uni=MIT` |
 
 ---
 
