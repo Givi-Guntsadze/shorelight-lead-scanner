@@ -16,25 +16,52 @@ import os
 import sys
 from datetime import datetime
 
+REGISTRATION_COLUMN_ALIASES = {
+    'full_name': 'full_name',
+    'fullname': 'full_name',
+    'name': 'full_name',
+    'email': 'email',
+    'phone': 'phone',
+    'school': 'school',
+    'grade': 'Grade',
+    'intake_year': 'intake_year',
+    'consent_text': 'consent_text',
+    'consent': 'consent_text',
+    'submission_time': 'submission_time',
+    'time': 'submission_time',
+}
+
+REPORT_COLUMN_LABELS = {
+    'full_name': 'fullName',
+    'school': 'School',
+    'Grade': 'Grade',
+    'phone': 'Phone',
+    'email': 'email',
+    'intake_year': 'intake_year',
+    'consent_text': 'consent',
+    'submission_time': 'time',
+    'UUID': 'UUID',
+}
+
 def load_data(reg_file: str, scans_file: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load and validate the input CSV files."""
     
     # Check files exist
     if not os.path.exists(reg_file):
-        print(f"❌ Error: {reg_file} not found")
+        print(f"ERROR: {reg_file} not found")
         print("   Export your Registration Sheet from Google Sheets as CSV")
         sys.exit(1)
         
     if not os.path.exists(scans_file):
-        print(f"❌ Error: {scans_file} not found")
+        print(f"ERROR: {scans_file} not found")
         print("   Export the Raw_Scans tab from Google Sheets as CSV")
         sys.exit(1)
     
     registrations = pd.read_csv(reg_file)
     scans = pd.read_csv(scans_file)
     
-    print(f"✓ Loaded {len(registrations)} registrations")
-    print(f"✓ Loaded {len(scans)} scans")
+    print(f"Loaded {len(registrations)} registrations")
+    print(f"Loaded {len(scans)} scans")
     
     return registrations, scans
 
@@ -53,12 +80,22 @@ def clean_data(registrations: pd.DataFrame, scans: pd.DataFrame) -> tuple[pd.Dat
             break
     
     if not uuid_col:
-        print("❌ Error: Could not find UUID column in registrations")
+        print("ERROR: Could not find UUID column in registrations")
         print(f"   Available columns: {list(registrations.columns)}")
         sys.exit(1)
     
     # Standardize UUID column name
     registrations = registrations.rename(columns={uuid_col: 'UUID'})
+
+    normalized_names: dict[str, str] = {}
+    for col in registrations.columns:
+        normalized = col.strip().lower().replace(' ', '_')
+        canonical = REGISTRATION_COLUMN_ALIASES.get(normalized)
+        if canonical and canonical not in registrations.columns:
+            normalized_names[col] = canonical
+
+    if normalized_names:
+        registrations = registrations.rename(columns=normalized_names)
     
     # Ensure UUID columns are strings
     registrations['UUID'] = registrations['UUID'].astype(str).str.strip().str.upper()
@@ -69,7 +106,9 @@ def clean_data(registrations: pd.DataFrame, scans: pd.DataFrame) -> tuple[pd.Dat
         for col in df.select_dtypes(include=['object']).columns:
             df[col] = df[col].apply(lambda x: str(x).replace('\ufffd', '') if pd.notna(x) else x)
     
-    print(f"✓ Data cleaned (UUID column: '{uuid_col}')")
+    print(f"Cleaned data (UUID column: '{uuid_col}')")
+    if normalized_names:
+        print(f"Normalized registration columns: {normalized_names}")
     
     return registrations, scans
 
@@ -84,12 +123,13 @@ def merge_data(registrations: pd.DataFrame, scans: pd.DataFrame) -> pd.DataFrame
     )
     
     # Check for unmatched scans
-    unmatched_col = 'full_name' if 'full_name' in merged.columns else 'Name' if 'Name' in merged.columns else merged.columns[0]
-    unmatched = merged[merged[unmatched_col].isna()]
+    match_column_candidates = ['full_name', 'email', 'phone', 'school', 'Grade']
+    unmatched_col = next((col for col in match_column_candidates if col in merged.columns), None)
+    unmatched = merged[merged[unmatched_col].isna()] if unmatched_col else pd.DataFrame()
     if len(unmatched) > 0:
-        print(f"⚠️  Warning: {len(unmatched)} scans could not be matched to registrations")
+        print(f"WARNING: {len(unmatched)} scans could not be matched to registrations")
     
-    print(f"✓ Merged data: {len(merged)} records")
+    print(f"Merged data: {len(merged)} records")
     
     return merged
 
@@ -101,17 +141,17 @@ def generate_reports(merged: pd.DataFrame, output_dir: str = 'reports'):
     
     # Get unique universities
     if 'Uni_ID' not in merged.columns:
-        print("❌ Error: 'Uni_ID' column not found in scans data")
+        print("ERROR: 'Uni_ID' column not found in scans data")
         sys.exit(1)
     
     universities = merged['Uni_ID'].dropna().unique()
-    print(f"\n📊 Generating reports for {len(universities)} universities...\n")
+    print(f"\nGenerating reports for {len(universities)} universities...\n")
     
     # Define columns to include in reports
     # Prioritize common registration fields, exclude internal IDs
     priority_columns = [
-        'full_name', 'email', 'phone', 'school',
-        'Grade', 'intake_year', 'consent_text', 'submission_time'
+        'full_name', 'school', 'Grade', 'phone',
+        'email', 'intake_year', 'consent_text', 'submission_time', 'UUID'
     ]
     
     # Find which columns actually exist
@@ -123,6 +163,9 @@ def generate_reports(merged: pd.DataFrame, output_dir: str = 'reports'):
         export_columns = [col for col in merged.columns if col not in exclude]
     
     print(f"   Exporting columns: {export_columns}\n")
+
+    match_column_candidates = ['full_name', 'email', 'phone', 'school', 'Grade']
+    report_match_column = next((col for col in match_column_candidates if col in merged.columns), None)
     
     # Generate report for each university
     total_leads = 0
@@ -134,13 +177,17 @@ def generate_reports(merged: pd.DataFrame, output_dir: str = 'reports'):
         filename = os.path.join(output_dir, f"leads_{uni_clean}.csv")
         
         # Export
+        if report_match_column:
+            uni_data = uni_data[uni_data[report_match_column].notna()]
+
         report = uni_data[export_columns].drop_duplicates()
+        report = report.rename(columns=REPORT_COLUMN_LABELS)
         report.to_csv(filename, index=False, encoding='utf-8')
         
-        print(f"   ✓ {uni}: {len(report)} leads → {filename}")
+        print(f"   OK {uni}: {len(report)} leads -> {filename}")
         total_leads += len(report)
     
-    print(f"\n✅ Done! Generated {len(universities)} reports with {total_leads} total leads.")
+    print(f"\nDone. Generated {len(universities)} reports with {total_leads} total leads.")
     print(f"   Output folder: {os.path.abspath(output_dir)}")
 
 def main():
@@ -157,8 +204,8 @@ def main():
         reg_file = sys.argv[1]
         scans_file = sys.argv[2]
     
-    print(f"📁 Registration file: {reg_file}")
-    print(f"📁 Scans file: {scans_file}\n")
+    print(f"Registration file: {reg_file}")
+    print(f"Scans file: {scans_file}\n")
     
     # Process
     registrations, scans = load_data(reg_file, scans_file)
