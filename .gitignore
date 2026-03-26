@@ -15,6 +15,7 @@ credentials/
 .vscode/
 .idea/
 *.swp
+node_modules/
 
 # OS
 .DS_Store
