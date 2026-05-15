@@ -14,7 +14,6 @@ OUTPUT:
 import pandas as pd
 import os
 import sys
-from datetime import datetime
 
 REGISTRATION_COLUMN_ALIASES = {
     'full_name': 'full_name',
@@ -24,6 +23,7 @@ REGISTRATION_COLUMN_ALIASES = {
     'phone': 'phone',
     'school': 'school',
     'grade': 'Grade',
+    'age': 'Age',
     'intake_year': 'intake_year',
     'consent_text': 'consent_text',
     'consent': 'consent_text',
@@ -35,6 +35,7 @@ REPORT_COLUMN_LABELS = {
     'full_name': 'fullName',
     'school': 'School',
     'Grade': 'Grade',
+    'Age': 'Age',
     'phone': 'Phone',
     'email': 'email',
     'intake_year': 'intake_year',
@@ -150,7 +151,7 @@ def generate_reports(merged: pd.DataFrame, output_dir: str = 'reports'):
     # Define columns to include in reports
     # Prioritize common registration fields, exclude internal IDs
     priority_columns = [
-        'full_name', 'school', 'Grade', 'phone',
+        'full_name', 'school', 'Grade', 'Age', 'phone',
         'email', 'intake_year', 'consent_text', 'submission_time', 'UUID'
     ]
     

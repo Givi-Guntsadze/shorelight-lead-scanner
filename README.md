@@ -1,6 +1,8 @@
-# Shorelight Lead Scanner
+# Lead Scanner (Event Scaffold)
 
-A complete lead retrieval system for education fairs. Enables 30+ universities to digitally collect leads from 3000+ attendees using their smartphones.
+A reusable lead retrieval scaffold for education events. Originally built for Shorelight, now used for multiple events (info sessions, fairs, partner visits). Each event gets its own Google Sheet + Web App URL; the scanner app and post-event script are shared.
+
+**Events run so far:** Shorelight fair (Mar 2026), Budget-Friendly Universities info session (May 2026)
 
 ## Architecture Overview
 
@@ -82,18 +84,24 @@ See `email-templates/confirmation-email.html` for a full template.
    - Access: Anyone
 5. Copy the Web App URL
 
-#### 2.2 Configure the Scanner
+#### 2.2 Configure the Scanner for the Event
+
+Each event has its own Google Sheet and therefore its own Web App URL.
 
 1. Open `index.html`
-2. Line ~239: Paste your Web App URL
+2. Line ~239: Replace the existing Web App URL with the new event's URL
 3. Commit and push to GitHub
-4. Enable GitHub Pages (Settings → Pages → main branch)
 
-#### 2.3 Create University Links
+GitHub Pages serves the latest commit, so updating the URL redeploys instantly.
 
-| University | URL |
-|------------|-----|
-| Shorelight | `https://givi-guntsadze.github.io/shorelight-lead-scanner/?uni=SHORELIGHT` |
+#### 2.3 Create Booth Links
+
+Booth links use the `?uni=` parameter to tag each scan with the scanning institution:
+
+| Event | Booth | URL |
+|-------|-------|-----|
+| Shorelight fair | Shorelight | `https://givi-guntsadze.github.io/shorelight-lead-scanner/?uni=SHORELIGHT` |
+| Budget-friendly info session | General | `https://givi-guntsadze.github.io/shorelight-lead-scanner/?uni=budgetfriendly` |
 
 ---
 
@@ -101,28 +109,54 @@ See `email-templates/confirmation-email.html` for a full template.
 
 #### 3.1 Export Data
 
-1. From your Registration Sheet → Download as `registrations.csv`
-2. From `Raw_Scans` tab → Download as `raw_scans.csv`
+Each event has its own Google Sheet. Export from the correct sheet for the event you're processing:
+
+1. From the event's Registration Sheet → Download as `registrations.csv`
+2. From the same sheet's `Raw_Scans` tab → Download as `raw_scans.csv`
+
+Place both files in the project root.
 
 #### 3.2 Run the Script
 
 ```bash
-# Install dependencies
+# Install dependencies (first time only)
 pip install -r requirements.txt
 
-# Process leads
+# Process leads (default: reads registrations.csv + raw_scans.csv)
 python scripts/process_leads.py
+
+# Or pass filenames explicitly
+python scripts/process_leads.py registrations.csv Raw_Scans.csv
 ```
 
 #### 3.3 Output
 
+One CSV per `Uni_ID` value found in the scans:
+
 ```
 reports/
-├── leads_HARVARD.csv
-├── leads_YALE.csv
-├── leads_MIT.csv
-└── ...
+├── leads_SHORELIGHT.csv
+├── leads_budgetfriendly.csv
+└── leads_<UNI_ID>.csv
 ```
+
+#### 3.4 Registration Column Flexibility
+
+Different events may use different form field names. `process_leads.py` normalizes common variations automatically. Supported aliases (all case-insensitive):
+
+| Form field name(s) | Normalized to |
+|--------------------|---------------|
+| `fullName`, `fullname`, `name`, `full_name` | `fullName` in output |
+| `email` | `email` |
+| `phone` | `Phone` |
+| `school` | `School` |
+| `grade`, `Grade` | `Grade` |
+| `intake_year`, `intake year` | `intake_year` |
+| `consent`, `consent_text` | `consent` |
+| `time`, `submission_time` | `time` |
+| `UUID`, `ticket_id`, `uuid` | join key (not in output) |
+
+Columns not in this list are collected but excluded from the output CSV. If a field is missing from the registration form entirely, that column is simply absent from the report.
 
 ---
 
