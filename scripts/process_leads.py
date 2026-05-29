@@ -1,6 +1,6 @@
 """
-Shorelight Lead Scanner - Post-Event Processing Script
-====================================================
+traQRecord - Post-Event Processing Script
+=========================================
 This script performs the "Split & Delivery" operation after the event ends.
 
 INPUTS:
@@ -8,7 +8,7 @@ INPUTS:
   - raw_scans.csv: Export from the "Raw_Scans" tab
 
 OUTPUT:
-  - leads_HARVARD.csv, leads_YALE.csv, etc. (one per university)
+  - leads_BOOTH_A.csv, leads_BOOTH_B.csv, etc. (one per booth/institution)
 """
 
 import pandas as pd
@@ -135,18 +135,18 @@ def merge_data(registrations: pd.DataFrame, scans: pd.DataFrame) -> pd.DataFrame
     return merged
 
 def generate_reports(merged: pd.DataFrame, output_dir: str = 'reports'):
-    """Generate one CSV file per university."""
+    """Generate one CSV file per booth or institution."""
     
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
     
-    # Get unique universities
+    # Get unique booth/institution IDs from the historical Uni_ID column.
     if 'Uni_ID' not in merged.columns:
         print("ERROR: 'Uni_ID' column not found in scans data")
         sys.exit(1)
     
-    universities = merged['Uni_ID'].dropna().unique()
-    print(f"\nGenerating reports for {len(universities)} universities...\n")
+    scan_targets = merged['Uni_ID'].dropna().unique()
+    print(f"\nGenerating reports for {len(scan_targets)} booth/institution IDs...\n")
     
     # Define columns to include in reports
     # Prioritize common registration fields, exclude internal IDs
@@ -168,9 +168,9 @@ def generate_reports(merged: pd.DataFrame, output_dir: str = 'reports'):
     match_column_candidates = ['full_name', 'email', 'phone', 'school', 'Grade']
     report_match_column = next((col for col in match_column_candidates if col in merged.columns), None)
     
-    # Generate report for each university
+    # Generate report for each booth/institution.
     total_leads = 0
-    for uni in sorted(universities):
+    for uni in sorted(scan_targets):
         uni_data = merged[merged['Uni_ID'] == uni]
         
         # Clean filename
@@ -188,12 +188,12 @@ def generate_reports(merged: pd.DataFrame, output_dir: str = 'reports'):
         print(f"   OK {uni}: {len(report)} leads -> {filename}")
         total_leads += len(report)
     
-    print(f"\nDone. Generated {len(universities)} reports with {total_leads} total leads.")
+    print(f"\nDone. Generated {len(scan_targets)} reports with {total_leads} total leads.")
     print(f"   Output folder: {os.path.abspath(output_dir)}")
 
 def main():
     print("\n" + "="*60)
-    print("  Shorelight Lead Scanner - Post-Event Processing")
+    print("  traQRecord - Post-Event Processing")
     print("="*60 + "\n")
     
     # Default file names

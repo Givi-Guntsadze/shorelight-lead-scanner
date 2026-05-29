@@ -121,7 +121,7 @@ async function main() {
     const perDevice = await Promise.all(
       devices.map(({ deviceNumber, uni, page }) =>
         page.evaluate(({ deviceNumber, uni }) => {
-          const queue = JSON.parse(localStorage.getItem("shorelight_scan_queue") || "[]");
+          const queue = JSON.parse(localStorage.getItem("traqrecord_scan_queue") || "[]");
           const fetches = window.__testLog.fetches || [];
           const scans = window.__testLog.scans || [];
           const busyAttempts = fetches.filter(

@@ -1,8 +1,8 @@
-# Lead Scanner (Event Scaffold)
+# traQRecord
 
-A reusable lead retrieval scaffold for education events. Originally built for Shorelight, now used for multiple events (info sessions, fairs, partner visits). Each event gets its own Google Sheet + Web App URL; the scanner app and post-event script are shared.
+traQRecord is a reusable lead retrieval scaffold for education events, info sessions, fairs, partner visits, and similar check-in workflows. Each event gets its own Google Sheet and Google Apps Script Web App URL; the scanner app and post-event script are shared.
 
-**Events run so far:** Shorelight fair (Mar 2026), Budget-Friendly Universities info session (May 2026)
+Use `traQRecord` for product and user-facing branding. Use `traqrecord` for repository names, URLs, storage keys, and other technical identifiers.
 
 ## Architecture Overview
 
@@ -16,13 +16,13 @@ A reusable lead retrieval scaffold for education events. Originally built for Sh
 ┌─────────────────────────────────────────────────────────────────────┐
 │                           EVENT DAY                                  │
 ├─────────────────────────────────────────────────────────────────────┤
-│  Volunteer opens ?uni=HARVARD → Scans QR → localStorage → Sheet     │
+│  Volunteer opens ?uni=BOOTH_A → Scans QR → localStorage → Sheet     │
 └─────────────────────────────────────────────────────────────────────┘
                                   ↓
 ┌─────────────────────────────────────────────────────────────────────┐
 │                          POST-EVENT                                  │
 ├─────────────────────────────────────────────────────────────────────┤
-│  Download CSVs → Run Python script → leads_HARVARD.csv per uni      │
+│  Download CSVs → Run Python script → leads_BOOTH_A.csv per booth    │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -31,7 +31,7 @@ A reusable lead retrieval scaffold for education events. Originally built for Sh
 ## Project Structure
 
 ```
-shorelight-lead-scanner/
+traqrecord/
 ├── index.html                    # Scanner PWA (deploy to GitHub Pages)
 ├── Code.gs                       # Google Apps Script (deploy as Web App)
 ├── email-templates/
@@ -89,19 +89,35 @@ See `email-templates/confirmation-email.html` for a full template.
 Each event has its own Google Sheet and therefore its own Web App URL.
 
 1. Open `index.html`
-2. Line ~239: Replace the existing Web App URL with the new event's URL
+2. Replace `API_URL` with the current event's Google Apps Script Web App URL
 3. Commit and push to GitHub
 
 GitHub Pages serves the latest commit, so updating the URL redeploys instantly.
 
-#### 2.3 Create Booth Links
+#### 2.3 Rename the GitHub Pages Path
+
+The GitHub Pages project URL includes the repository name. Keep the repository name neutral so public links do not mention a past event.
+
+Recommended repo name:
+
+```
+traqrecord
+```
+
+Expected project URL after the GitHub repository is renamed:
+
+```
+https://givi-guntsadze.github.io/traqrecord/
+```
+
+#### 2.4 Create Booth Links
 
 Booth links use the `?uni=` parameter to tag each scan with the scanning institution:
 
-| Event | Booth | URL |
-|-------|-------|-----|
-| Shorelight fair | Shorelight | `https://givi-guntsadze.github.io/shorelight-lead-scanner/?uni=SHORELIGHT` |
-| Budget-friendly info session | General | `https://givi-guntsadze.github.io/shorelight-lead-scanner/?uni=budgetfriendly` |
+| Event | Booth or institution | URL |
+|-------|----------------------|-----|
+| Current event | Booth A | `https://givi-guntsadze.github.io/traqrecord/?uni=BOOTH_A` |
+| Current event | General desk | `https://givi-guntsadze.github.io/traqrecord/?uni=GENERAL` |
 
 ---
 
@@ -131,12 +147,12 @@ python scripts/process_leads.py registrations.csv Raw_Scans.csv
 
 #### 3.3 Output
 
-One CSV per `Uni_ID` value found in the scans:
+One CSV per `Uni_ID` value found in the scans. `Uni_ID` is the historical column name; it can represent a university, booth, partner, counselor, or general scanning station.
 
 ```
 reports/
-├── leads_SHORELIGHT.csv
-├── leads_budgetfriendly.csv
+├── leads_BOOTH_A.csv
+├── leads_GENERAL.csv
 └── leads_<UNI_ID>.csv
 ```
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Load-test Shorelight scanner Apps Script endpoint with configurable scenarios."""
+"""Load-test the traQRecord Apps Script endpoint with configurable scenarios."""
 
 from __future__ import annotations
 

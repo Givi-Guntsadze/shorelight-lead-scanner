@@ -1,5 +1,5 @@
 /**
- * Shorelight Lead Receiver - Google Apps Script
+ * traQRecord Lead Receiver - Google Apps Script
  * 
  * This script receives scan data from the PWA and appends it to the active sheet.
  * Deploy as: Web App | Execute as: Me | Access: Anyone

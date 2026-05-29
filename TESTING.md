@@ -1,4 +1,4 @@
-# Testing Plan for Shorelight Live Scanner
+# Testing Plan for traQRecord
 
 ## ✅ Automated Tests Completed
 
@@ -9,7 +9,7 @@ I've already tested the app in-browser. Here are the results:
 | Test | Status | Details |
 |------|--------|---------|
 | UI loads correctly | ✅ PASS | All elements render properly |
-| URL parameter works | ✅ PASS | `?uni=HARVARD` displays correctly |
+| URL parameter works | ✅ PASS | `?uni=BOOTH_A` displays correctly |
 | Camera initializes | ✅ PASS | Scanner widget loads |
 | Queue system | ✅ PASS | localStorage saves scans |
 | UI updates | ✅ PASS | Pending count updates when scans added |
@@ -20,7 +20,7 @@ I've already tested the app in-browser. Here are the results:
 
 ![Initial Scanner State](file:///C:/Users/user/.gemini/antigravity/brain/466c1198-1be0-4f52-9050-64e56f9bccf4/initial_scanner_state_1768313266727.png)
 
-*Clean UI on load showing "HARVARD" and empty scan list*
+*Clean UI on load showing the booth/institution ID and empty scan list*
 
 ![Scan Working](file:///C:/Users/user/.gemini/antigravity/brain/466c1198-1be0-4f52-9050-64e56f9bccf4/final_scan_list_working_1768313355699.png)
 
@@ -37,13 +37,13 @@ Since the app works perfectly, you now need to host it on a real web server (not
 #### Commands to run:
 
 ```bash
-cd c:\Users\user\Documents\LEAF\shorelight-lead-scanner
+cd c:\Users\user\Documents\LEAF\traqrecord
 
 # Stage all files
 git add -A
 
 # Commit
-git commit -m "Complete Shorelight Live Scanner v1"
+git commit -m "Complete traQRecord v1"
 
 # Push to GitHub
 git push origin main
@@ -59,7 +59,7 @@ git push origin main
 
 Your app will be live at:
 ```
-https://YOUR_USERNAME.github.io/shorelight-lead-scanner/
+https://YOUR_USERNAME.github.io/traqrecord/
 ```
 
 ---
@@ -68,7 +68,7 @@ https://YOUR_USERNAME.github.io/shorelight-lead-scanner/
 
 Once deployed, test the real scanner:
 
-1. Open on your phone: `https://YOUR_USERNAME.github.io/shorelight-lead-scanner/?uni=TEST`
+1. Open on your phone: `https://YOUR_USERNAME.github.io/traqrecord/?uni=TEST`
 2. Allow camera permissions
 3. Scan a QR code (or generate one at [qr-code-generator.com](https://www.qr-code-generator.com/) with text like "USER-123")
 4. Watch for the green flash
@@ -76,13 +76,13 @@ Once deployed, test the real scanner:
 
 ---
 
-### Step 3: Create University Links
+### Step 3: Create Booth or Institution Links
 
-Generate unique scanner URLs for each university:
+Generate unique scanner URLs for each booth or institution:
 
-| University | URL |
-|------------|-----|
-| Shorelight | `https://givi-guntsadze.github.io/shorelight-lead-scanner/?uni=SHORELIGHT` |
+| Booth or institution | URL |
+|----------------------|-----|
+| General desk | `https://givi-guntsadze.github.io/traqrecord/?uni=GENERAL` |
 
 **Tip**: Convert these URLs to QR codes and print them so volunteers can just scan-to-open.
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shorelight Live Scanner</title>
+    <title>traQRecord</title>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         :root {
@@ -234,19 +234,19 @@
 
     <script>
         // =====================================================
-        // CONFIGURATION - Paste your Google Apps Script URL here
+        // CONFIGURATION - Paste the current event's Google Apps Script Web App URL here.
         // =====================================================
         const API_URL = "https://script.google.com/macros/s/AKfycbwioi1EbRMauKJ7jX2qzFM7T-bt9iGh92LeIshJdLAai4G84BDMJEYKzR3av0DxLMCG8A/exec";
         // =====================================================
 
         // --- STATE ---
-        const STORAGE_KEY = 'shorelight_scan_queue';
+        const STORAGE_KEY = 'traqrecord_scan_queue';
         let scanQueue = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         let isOnline = navigator.onLine;
         let isSyncing = false;
         let html5QrCode = null;
 
-        // --- Get University ID from URL ---
+        // --- Get booth/institution ID from URL. Keep `uni` for URL compatibility. ---
         const urlParams = new URLSearchParams(window.location.search);
         const UNI_ID = urlParams.get('uni');
 
@@ -256,7 +256,7 @@
             <h1 style="color: #ef4444;">Configuration Error</h1>
             <p style="color: #94a3b8; margin-top: 16px;">
                 Missing <code>?uni=NAME</code> in URL.<br><br>
-                Example: <code>yoursite.com/scan?uni=HARVARD</code>
+                Example: <code>yoursite.com/traqrecord/?uni=BOOTH_A</code>
             </p>
         </div>
     `;
